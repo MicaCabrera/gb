@@ -7,7 +7,7 @@ import { Filters } from './Filters'
 import { Product } from './Product'
 
 export const ProductList = () => {
-  const [allProducts, setAllProducts] = useState([])
+  const [filteredProducts, setFilteredProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
@@ -15,11 +15,10 @@ export const ProductList = () => {
     const getData = async () => {
       try {
         const products = await getAllProducts()
-        setAllProducts(products)
+        setFilteredProducts(products)
         setLoading(false)
       } catch (error) {
         setError(true)
-      } finally {
         setLoading(false)
       }
     }
@@ -27,10 +26,14 @@ export const ProductList = () => {
     getData()
   }, [])
 
+  const handleFilteredProducts = (filtered) => {
+    setFilteredProducts(filtered)
+  }
+
   return (
     <Container>
       <Container sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-        <Filters />
+        <Filters onFilter={handleFilteredProducts} />
       </Container>
 
       <Grid
@@ -44,12 +47,14 @@ export const ProductList = () => {
       >
         {loading && <Spinner />}
         {error && <p>Error</p>}
-        {allProducts.map((product) => (
+        {filteredProducts.map((product) => (
           <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
             <Product product={product} />
           </Grid>
         ))}
-        {!allProducts.length && !loading && <p>No hay productos que mostrar</p>}
+        {!filteredProducts.length && !loading && (
+          <p>No hay productos que mostrar</p>
+        )}
       </Grid>
     </Container>
   )
